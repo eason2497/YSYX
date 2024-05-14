@@ -1,4 +1,4 @@
-TOPNAME = light
+TOPNAME = top
 NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
@@ -40,7 +40,7 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
                 $(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
                 --Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 	# verilator -MMD --build --cc -O3 --x-assgin fast --x-initial fast --noassert --trace \
-	#--top-module top top.v bcd7seg.v sim_main.cpp auto_bind.cpp \
+	#--top-module top top.v bcd7seg.v main.cpp auto_bind.cpp \
 	#-CFLAGS -I -DTOP_NAME="\"VTOP\"" -LDFLAGS -lSDL2 -lSDL2_image \
 	#--Mdir ./build/obj_dir --exe -o ./build/top
 	#--top-module top 指定顶层文件名 --Mdir 将生成的文件都放入obj_dir目录中 --exe -o ./build/top 产生可执行文件并指定
@@ -52,15 +52,16 @@ all:
 
 run: $(BIN)
 	@$^
+	$(call git_commit, "sim RTL") 
 
-sim:	*.cpp *.v
+sim:	./mains/*.cpp ./vsrc/*.v
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	verilator --cc --exe --build -j 0 -Wall ./csrc/*.cpp ./vsrc/top.v
-	make -C obj_dir -f Vtop.mk Vtop ./nvboard.a $(addprefix -LDFLAGS, $(LDFLAGS))
+	verilator --cc --exe --build -j 0 -Wall --trace ./mains/FSM_bin.cpp ./vsrc/FSM_bin.v
 
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -rf $(abspath ./obj_dir)
 
 .PHONY: default all clean run
 
