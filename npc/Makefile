@@ -1,4 +1,4 @@
-TOPNAME = top
+TOPNAME = keyboard
 NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
@@ -22,6 +22,7 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 
 
 # project source
+MAINS = $(shell find $(abspath ./mains) -name "*.cpp")
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 CSRCS += $(SRC_AUTO_BIND)
@@ -54,10 +55,16 @@ run: $(BIN)
 	@$^
 	$(call git_commit, "sim RTL") 
 
-sim:	./mains/*.cpp ./vsrc/*.v
+sim: $(MAINS) $(VSRCS)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	verilator --cc --exe --build -j 0 -Wall --trace ./mains/FSM_bin.cpp ./vsrc/FSM_bin.v
+	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/mux41_main.cpp ./vsrc/mux41.v
+	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/m_mux21_main.cpp ./vsrc/m_mux21.v
+	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/mux_2bit_main.cpp $(VSRCS) --top-module mux_2bit
+	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/decode24_main.cpp $(VSRCS) --top-module decode24
+	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/encode42_main.cpp $(VSRCS) --top-module encode42
+	verilator --cc --exe --build -j 0 -Wall --trace ./mains/encode83_main.cpp $(VSRCS) --top-module encode83
+	# verilator --cc --exe --build -j 0 -Wall --trace -top m_mux21 $^
 
 clean:
 	rm -rf $(BUILD_DIR)
