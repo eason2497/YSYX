@@ -109,7 +109,7 @@ void watchpoint_info(){
 }
 
 void watchpoint_diff() {     //还需调试,未作出同时两个wp同时改变的应对
-  WP *pos = ead;h
+  WP *pos = head;
   while(pos) {
     bool success = true;
     word_t new = expr(pos->expression, &success);
