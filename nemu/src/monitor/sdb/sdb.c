@@ -190,7 +190,7 @@ void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
 
-void sdb_mainloop() {
+void sdb_mainloop() {      //如果是batchmode将自动运行c指令
   if (is_batch_mode) {
     cmd_c(NULL);
     return;
