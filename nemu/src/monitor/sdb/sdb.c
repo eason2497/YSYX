@@ -18,11 +18,14 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+//#include "watchpoint.c"
+//#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
+
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -49,8 +52,94 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+  //Log("%d", nemu_state.state); //为修改前state是NEMU_RUNNING，过不了正常退出判断
+  nemu_state.state = NEMU_QUIT;  //在退出时修改为退出的state
   return -1;
 }
+
+static int cmd_si(char *args) {
+  uint64_t n = 0;
+  char *endptr;
+  char *arg = strtok(NULL, " ");  //这里使用NULL是因为需要提供的str已经在sdb_main中提供了
+  if (arg == NULL) {
+    cpu_exec(1);
+    return 0;  
+  } 
+  n = strtol(arg, &endptr, 10);
+  if (*endptr != '\0') {
+    Log("Error. Not an integer.\n");
+  } else {
+    cpu_exec(n);
+  }
+  return 0;
+}
+
+static int cmd_info(char *args){
+  char *arg = strtok(NULL, " ");
+  if (arg == NULL) {
+    Log("Please give the subcmd.\n");
+    return 0;
+  } else if (strcmp(arg, "r") == 0) {
+    isa_reg_display();
+    return 0;
+  } else if (strcmp(arg, "w") == 0) {
+    watchpoint_info();
+    return 0;
+  }
+  return 0;
+}
+
+static int cmd_x(char *args){
+  if (args == NULL) {
+    printf("Error. Invalid Address input\n");
+    return 0;
+  }
+  int N;
+  uint32_t startAddress;
+  sscanf(args, "%d %x", &N, &startAddress); //使用sscanf分别读如地址和输出的字节
+  for (int i = 0;i < N; i++) {
+    printf("%x\n", vaddr_read(startAddress, 4)); //4代表4个字节也就是32位
+    startAddress += 4;
+  }
+  return 0;
+}
+
+static int cmd_p(char *args){
+  bool success = true;
+  int32_t res = expr(args, &success);
+  if (!success) {
+    printf("invalid expression\n");
+  } else {
+    printf("%d\n", res);
+  }
+  return 0;
+}
+static int cmd_w(char *args) {
+  if (!args) {
+    printf("Error");	  
+    return 0;
+  }
+  bool success = true;
+  //Log("%s", args);
+  int32_t res = expr(args, &success);
+  if (!success) {
+    printf("Invalid expression\n");
+  } else {
+    set_watchpoint(args, res);
+  }
+  return 0;
+}
+
+static int cmd_d(char *args) {
+  char *arg = strtok(NULL, "");
+  if (!arg) {
+    printf("Error");
+    return 0;
+  }
+  int watchpoint = strtol(arg, NULL, 10);
+  remove_watchpoint(watchpoint);
+  return 0;
+}	
 
 static int cmd_help(char *args);
 
@@ -62,7 +151,12 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
+  { "si", "Execute n lines", cmd_si},
+  { "info", "r to print registers status and w to print watchpoint information", cmd_info},
+  { "x", "Get EXPR's value, take it as the start storage output n 4 Bytes", cmd_x},
+  { "p", "Get expression value", cmd_p},
+  { "w", "Set watchpoint", cmd_w},
+  { "d", "Delete watchpoint", cmd_d},
   /* TODO: Add more commands */
 
 };
@@ -112,6 +206,8 @@ void sdb_mainloop() {
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
+    //char *subcmd = strtok(NULL, " ");
+
     char *args = cmd + strlen(cmd) + 1;
     if (args >= str_end) {
       args = NULL;
@@ -140,4 +236,5 @@ void init_sdb() {
 
   /* Initialize the watchpoint pool. */
   init_wp_pool();
+  Log("Watchpoint pool inited");
 }

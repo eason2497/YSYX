@@ -19,5 +19,10 @@
 #include <common.h>
 
 word_t expr(char *e, bool *success);
+word_t paddr_read(paddr_t addr, int len);
+word_t vaddr_read(paddr_t addr, int len);
+void set_watchpoint(char *args, int32_t res);
+void remove_watchpoint(int no);
+void watchpoint_info();
 
 #endif
