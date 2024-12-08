@@ -17,25 +17,25 @@ endif
 ifeq ($(findstring $(MAKECMDGOALS),clean|clean-all|html),)
 
 ### Print build info message
-$(info # Building $(NAME)-$(MAKECMDGOALS) [$(ARCH)])
+$(info # Building $(NAME)-$(MAKECMDGOALS) [$(ARCH)]) #打印
 
 ### Check: environment variable `$AM_HOME` looks sane
 ifeq ($(wildcard $(AM_HOME)/am/include/am.h),)
-  $(error $$AM_HOME must be an AbstractMachine repo)
+  $(error $$AM_HOME must be an AbstractMachine repo)       #报错并打印后面的text
 endif
 
 ### Check: environment variable `$ARCH` must be in the supported list
-ARCHS = $(basename $(notdir $(shell ls $(AM_HOME)/scripts/*.mk)))
-ifeq ($(filter $(ARCHS), $(ARCH)), )
-  $(error Expected $$ARCH in {$(ARCHS)}, Got "$(ARCH)")
+ARCHS = $(basename $(notdir $(shell ls $(AM_HOME)/scripts/*.mk)))    #basename把names中除后缀外的信息全提取出来
+ifeq ($(filter $(ARCHS), $(ARCH)), ) 								 #notdir把除了directory外的信息全提取出来
+  $(error Expected $$ARCH in {$(ARCHS)}, Got "$(ARCH)")				 #filter会返回$(ARCH)中与$(ARCHS)match的内容
 endif
 
 ### Extract instruction set architecture (`ISA`) and platform from `$ARCH`. Example: `ARCH=x86_64-qemu -> ISA=x86_64; PLATFORM=qemu`
-ARCH_SPLIT = $(subst -, ,$(ARCH))
+ARCH_SPLIT = $(subst -, ,$(ARCH))			#subst把$(ARCH)中的-替换成了空格； word从$(ARCH_SPLIT)中返回第n个word
 ISA        = $(word 1,$(ARCH_SPLIT))
 PLATFORM   = $(word 2,$(ARCH_SPLIT))
 
-### Check if there is something to build
+### Check if there is something to build    #flavor根据变量的赋值方法返回相对应的类型
 ifeq ($(flavor SRCS), undefined)
   $(error Nothing to build)
 endif
@@ -104,7 +104,7 @@ endif
 
 ## 5. Compilation Rules
 
-### Rule (compile): a single `.c` -> `.o` (gcc)
+### Rule (compile): a single `.c` -> `.o` (gcc)      #@使得在make的时候此条指令进行执行但不会被打印
 $(DST_DIR)/%.o: %.c
 	@mkdir -p $(dir $@) && echo + CC $<
 	@$(CC) -std=gnu11 $(CFLAGS) -c -o $@ $(realpath $<)

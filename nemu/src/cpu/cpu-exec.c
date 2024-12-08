@@ -30,8 +30,11 @@ uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
+
 void device_update();
 void watchpoint_diff();
+void display_iringbuf();
+void readELF();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {  //通过在此添加Watchpoint的config判断
 #ifdef CONFIG_ITRACE_COND                                      //每次循环对比watchpoint的值是否有变化   
@@ -79,7 +82,7 @@ static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) { 
     exec_once(&s, cpu.pc);
-    g_nr_guest_inst ++;
+    g_nr_guest_inst ++;         //对客户指令技术器加1
     trace_and_difftest(&s, cpu.pc);          
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
@@ -97,6 +100,7 @@ static void statistic() {
 
 void assert_fail_msg() {
   isa_reg_display();
+  display_iringbuf();
   statistic();
 }
 
@@ -126,6 +130,8 @@ void cpu_exec(uint64_t n) {
            (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           nemu_state.halt_pc);
+      display_iringbuf();
+      //readELF();
       // fall through
     case NEMU_QUIT: statistic();
   }

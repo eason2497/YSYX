@@ -47,6 +47,13 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	#--top-module top 指定顶层文件名 --Mdir 将生成的文件都放入obj_dir目录中 --exe -o ./build/top 产生可执行文件并指定
 
 
+IMG ?=
+
+simulator: $(MAINS) $(VSRCS)
+	verilator --cc --exe --build -j 0 --trace ./mains/ysyx_24100013_CPU_main.cpp $(VSRCS) --top-module ysyx_24100013_CPU
+
+BINARY = ./obj_dir/Vysyx_24100013_CPU
+
 
 all:
 	@echo "Write this Makefile by your self."
@@ -55,16 +62,10 @@ run: $(BIN)
 	@$^
 	$(call git_commit, "sim RTL") 
 
-sim: $(MAINS) $(VSRCS)
+sim: simulator $(MAINS) $(VSRCS) $(IMG)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/mux41_main.cpp ./vsrc/mux41.v
-	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/m_mux21_main.cpp ./vsrc/m_mux21.v
-	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/mux_2bit_main.cpp $(VSRCS) --top-module mux_2bit
-	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/decode24_main.cpp $(VSRCS) --top-module decode24
-	#verilator --cc --exe --build -j 0 -Wall --trace ./mains/encode42_main.cpp $(VSRCS) --top-module encode42
-	verilator --cc --exe --build -j 0 -Wall --trace ./mains/encode83_main.cpp $(VSRCS) --top-module encode83
-	# verilator --cc --exe --build -j 0 -Wall --trace -top m_mux21 $^
+	$(BINARY) $(IMG)
 
 clean:
 	rm -rf $(BUILD_DIR)

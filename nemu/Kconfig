@@ -216,8 +216,20 @@ config RT_CHECK
 
 endmenu
 
-config WATCHPOINT                //added Watchpoint config here
+config WATCHPOINT               
   bool "Enable watchpoint"
   default n
   help
     Enable watchpoint feature to monitor memory access.
+
+config MTRACE
+  bool "Enable mtrace"
+  default n
+  help
+    Enable mtrace to track memory access
+
+config FTRACE
+  bool "Enable ftrace"
+  default n
+  help
+    Enable ftrace to trace function call
