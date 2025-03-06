@@ -115,8 +115,8 @@ void watchpoint_diff() {     //还需调试,未作出同时两个wp同时改变�
     word_t new = expr(pos->expression, &success);
     if (pos-> value != new) {
       printf("Watchpoint %d: %s\n"
-		      "Old value = %d\n"
-		      "New value = %d\n",
+		      "Old value = 0x%x\n"
+		      "New value = 0x%x\n",
 		      pos->NO, pos->expression, pos->value, new);
       pos->value = new;
       nemu_state.state = NEMU_STOP;

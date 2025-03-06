@@ -48,6 +48,7 @@ void trace_inst(word_t pc,  uint32_t inst) {
     current = (current + 1) % MAX_INST_TO_RECORD;
 }
 
+#ifdef CONFIG_ITRACE
 void display_iringbuf() {
     int i;
     int cur = current;
@@ -60,6 +61,7 @@ void display_iringbuf() {
       printf("%s\n", buf);
     }
 }
+#endif
 
 void mtrace_read(paddr_t addr, int len) {
   printf("Paddr read  at " FMT_PADDR " len = %d\n", addr, len);

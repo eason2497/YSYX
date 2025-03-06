@@ -7,13 +7,18 @@ module ysyx_24100013_IDU (
     output reg [6:0] opcode,
     output reg [2:0] funct3,
     output reg [6:0] funct7,
+    output reg [31:0] a0,
     //output wen
+    output reg [31:0] instruction,
     output reg [31:0] outputtype
 );
-    import "DPI-C" function void npc_trap();
+    import "DPI-C" function void npc_trap(int halt_ret);
     //import "DPI-C" function int add(input int a, input int b);
     import "DPI-C" function int instruction_type_check();
+    import "DPI-C" function int instruction_check();
     ///*
+
+    //reg [31:0] instruction;
     assign rs1 = {inst[19:15]};
     assign rs2 = {inst[24:20]};
     assign rd = {inst[11:7]}; 
@@ -36,8 +41,10 @@ module ysyx_24100013_IDU (
         funct7 <= {inst[31:25]};
         //*/
         if (inst == 32'h00100073) begin
-            npc_trap();
+            npc_trap(a0);
         end
         outputtype = instruction_type_check();
+        instruction = instruction_check();
+        //$display("instruction is %d", instruction);
     end
 endmodule

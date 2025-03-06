@@ -13,9 +13,9 @@ LDFLAGS   += -T $(AM_HOME)/scripts/linker.ld \
 LDFLAGS   += --gc-sections -e _start
 NEMUFLAGS += -l $(shell dirname $(IMAGE).elf)/nemu-log.txt
 NEMUFLAGS += -e $(IMAGE).elf   #如果uncomment掉就会报错 (原因是因为没有使用optarg读取下一个arg导致后面的arg load的不对)
-NEMUFLAGS += -b
+#NEMUFLAGS += -b
 
-CFLAGS += -DMAINARGS=\"$(mainargs)\"
+CFLAGS += -DMAINARGS=\"$(mainargs)\"            #native是用getenv函数获得的mainargs
 CFLAGS += -I$(AM_HOME)/am/src/platform/nemu/include
 .PHONY: $(AM_HOME)/am/src/platform/nemu/trm.c
 

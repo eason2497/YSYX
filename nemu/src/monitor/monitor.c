@@ -83,7 +83,9 @@ static int parse_args(int argc, char *argv[]) {
   };
   int o;
   while ( (o = getopt_long(argc, argv, "-bhl:d:p:e:", table, NULL)) != -1) {  //添加-b实现batchmode
-    Log("run");                                                               //e后面的冒号很重要，代表了输入的值
+    //assert(0);
+    //Log("run");  
+    printf("run\n");                                                         //e后面的冒号很重要，代表了输入的值
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
       case 'p': sscanf(optarg, "%d", &difftest_port); break;

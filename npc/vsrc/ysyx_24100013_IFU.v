@@ -1,8 +1,8 @@
 module ysyx_24100013_IFU (
     input clk,
     input rst,
-    input [31:0] pc,
-    //input [31:0] dnpc,
+    output reg [31:0] dnpc,
+    output reg [31:0] pc,
     output reg [31:0] inst
     //output reg [31:0] pmem [31:0]
 );
@@ -11,14 +11,16 @@ module ysyx_24100013_IFU (
 
 import "DPI-C" function int unsigned pmem_read( int unsigned addr, int len);
 
-    always @(posedge clk) begin
+    always @(*) begin
         if (rst == 1) begin
-            inst <= 32'b0;
+            inst = 32'b0;
             //pc = 32'h80000000;
+            dnpc = 32'h80000000 - 8;
         end
         else begin
             //$display("pc = 0x%x", pc);
-            inst <= pmem_read(pc, 4);
+            inst = pmem_read(pc, 4);
+            dnpc = pc;
             //pc = dnpc;
             //$display("pc = 0x%x", pc);
         end

@@ -24,7 +24,7 @@ module ysyx_24100013_imm (
     assign itype = {intputtype[2:0]};
     assign immI = {{20{inst[31]}}, inst[31:20]};
     assign immS = {{20{1'b0}}, inst[31:25], inst[11:7]};
-    assign immB = {{19{1'b0}}, inst[31], inst[7:7], inst[30:25], inst[11:8], {1'b0}};
+    assign immB = {{19{inst[31]}}, inst[31], inst[7:7], inst[30:25], inst[11:8], {1'b0}};
     assign immU = {inst[31:12], {12{1'b0}}};
     assign immJ = {{11{inst[31]}}, inst[31], inst[19:12], inst[20], inst[30:21], {1'b0}};  //补充高12位时应与inst[31]一致
 
@@ -42,8 +42,9 @@ module ysyx_24100013_imm (
     //*/
     
     //*
-    always @(inst) begin
+    always @(*) begin
         case (itype)
+            3'b000: imm = 32'b0;
             3'b001: imm = immI;
             3'b010: imm = immS;
             3'b011: imm = immB;
