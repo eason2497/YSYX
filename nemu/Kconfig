@@ -233,3 +233,9 @@ config FTRACE
   default n
   help
     Enable ftrace to trace function call
+
+config DTRACE
+  bool "Enable dtrace"
+  default n
+  help
+    Enable dtrace to trace devices

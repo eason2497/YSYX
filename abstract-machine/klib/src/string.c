@@ -5,9 +5,12 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 size_t strlen(const char *s) {
-  const char *str;
-  for (str = s; *str; ++str);
-  return (str - s);
+  int l = 0;
+  while (*s != '\0') {
+    l++;
+    s++;
+  }
+  return l;
   //panic("Not implemented");
 }
 
@@ -107,6 +110,7 @@ void *memmove(void *dst, const void *src, size_t n) {
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
+  /*
   size_t i;
   char *ptr_out = (char *)out;
   char *ptr_in = (char *)in;
@@ -115,10 +119,16 @@ void *memcpy(void *out, const void *in, size_t n) {
     ptr_out[i] = ptr_in[i];
   }
   return out;
+  */
+  for(int i=0; i<n; i++) {
+    ((char*)out)[i]=((char*)in)[i];
+  }
+  return out;
   //panic("Not implemented");
 }
 
 int memcmp(const void *s1, const void *s2, size_t n) {
+  /*
   size_t i;
   char * str1 = (char *) s1;
   char * str2 = (char *) s2;
@@ -128,6 +138,13 @@ int memcmp(const void *s1, const void *s2, size_t n) {
       return -1;
     } else if (str1[i] > str2[i]) {
       return 1;
+    }
+  }
+  return 0;
+  */
+  for(int i=0; i<n; i++) {
+    if (((uint8_t*)s1)[i]!=((uint8_t*)s2)[i]) {
+      return ((uint8_t*)s1)[i]-((uint8_t*)s2)[i];
     }
   }
   return 0;

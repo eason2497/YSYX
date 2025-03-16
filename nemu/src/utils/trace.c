@@ -1,7 +1,9 @@
+#include <isa.h>
 #include <common.h>
 #include <elf.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <device/map.h>
 
 #define MAX_INST_TO_RECORD 16
 # define ELF_RELOC_ERR -1
@@ -69,6 +71,16 @@ void mtrace_read(paddr_t addr, int len) {
 
 void mtrace_write(paddr_t addr, int len, word_t data) {
   printf("Paddr write at " FMT_PADDR " len = %d  " "data =" FMT_WORD "\n", addr, len, data);
+}
+
+void dtrace_read(void* addr, int len, IOMap *map) {
+	printf("\n");
+	printf("dtrace read Device Name: %s, pc at " FMT_PADDR " with byte = %d\n", map->name, cpu.pc, len);
+}
+
+void dtrace_write(void* addr, int len, IOMap *map, word_t data) {
+	printf("\n");
+	printf("dtrace write Device Name: %s, pc at " FMT_PADDR " with byte = %d, reading data " FMT_WORD "\n", map->name, cpu.pc, len, data);
 }
 
 bool elf_check_file(Elf32_Ehdr *hdr) {

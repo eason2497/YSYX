@@ -6,8 +6,8 @@ static uint64_t boot_time = 0;
 
 ///*
 static uint64_t read_time() {
-  uint64_t us_low = inl(RTC_ADDR);
-  uint64_t us_high = inl(RTC_ADDR + 4);
+  uint64_t us_high = inl(RTC_ADDR + 4);         //访问RTC_ADDR + 4时，才会更新时间 
+  uint64_t us_low = inl(RTC_ADDR);              //之前dhrystone浮点数错误是因为更新问题导致除零了
   uint64_t time = ((uint64_t)us_high << 32) | us_low;
   return time;
 }
